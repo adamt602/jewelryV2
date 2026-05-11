@@ -246,6 +246,8 @@
       </div>
     </div>
     <div class="pg pg4" id="shop-grid"></div>
+    <!-- recently viewed (populated by JS) -->
+    <div id="recently-viewed" style="display:none"></div>
     <div style="height:72px"></div>
   </div>
 </div>
@@ -528,7 +530,7 @@
 <!-- ═══ CARE GUIDE ══════════════════════════════════════════════════ -->
 <div class="page" id="page-care">
   <div class="wrap">
-    <div class="ph rv"><p class="ph-ey">care guide</p><h1 class="ph-h">Keeping your piece<br><em>for a long time.</em></h1></div>
+    <div class="ph rv" style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap"><div><p class="ph-ey">care guide</p><h1 class="ph-h">Keeping your piece<br><em>for a long time.</em></h1></div>
     <div class="care-intro">
       <div class="rv-l"><div style="aspect-ratio:1;background:var(--paper-d);overflow:hidden"><img data-src="turquoiseSlab" alt="Stone care" style="width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply"></div></div>
       <div class="rv-r">
@@ -934,5 +936,58 @@
 <script src="assets/js/images.js"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/app.js"></script>
+
+<!-- ═══ COMPARE TRAY ══════════════════════════════════════════ -->
+<div id="cmp-tray">
+  <div class="cmp-inner">
+    <span class="cmp-label">Comparing</span>
+    <div class="cmp-slots">
+      <div class="cmp-slot cmp-slot-empty" id="cmp-slot-0">add a piece</div>
+      <div class="cmp-slot cmp-slot-empty" id="cmp-slot-1">add a piece</div>
+      <div class="cmp-slot cmp-slot-empty" id="cmp-slot-2">add a piece</div>
+    </div>
+    <div class="cmp-actions">
+      <button id="cmp-view-btn" class="btn btn-dark" style="padding:10px 18px;font-size:10px">Compare ✦</button>
+      <button class="cmp-clear" id="cmp-clear">clear</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ COMPARE OVERLAY ════════════════════════════════════════ -->
+<div id="cmp-ov">
+  <div id="cmp-box">
+    <button class="cmp-close" id="cmp-close">close ×</button>
+    <p class="sec-ey">side by side</p>
+    <h2 style="font-family:'Fraunces',serif;font-weight:300;font-size:clamp(1.8rem,3.5vw,2.8rem);color:var(--ink);margin-bottom:24px">Comparing <em>the pieces.</em></h2>
+    <div id="cmp-table"></div>
+  </div>
+</div>
+
+<!-- ═══ NOTIFY ME ══════════════════════════════════════════════ -->
+<div id="notify-ov">
+  <div id="notify-box">
+    <button class="notify-close" id="notify-close">close ×</button>
+    <p class="notify-ey">edition alert</p>
+    <h3 class="notify-h">Tell me when <em id="notify-piece-name">this piece</em> has a new opening.</h3>
+    <p class="notify-b">We will write to you the moment a piece becomes available, or when the next edition opens. No other emails.</p>
+    <div class="notify-form" id="notify-form">
+      <input class="notify-inp" id="notify-email" type="email" placeholder="your email" autocomplete="email">
+      <button class="notify-btn" id="notify-submit">notify me</button>
+    </div>
+    <p class="notify-ok" id="notify-ok" style="display:none">received. we will write when it opens. ✦</p>
+  </div>
+</div>
+
+<!-- ═══ STICKY MOBILE BUY BAR ══════════════════════════════════ -->
+<div id="sticky-bar">
+  <div class="sb-info">
+    <p class="sb-name" id="sb-name">The Esther</p>
+    <p class="sb-price" id="sb-price">$168</p>
+  </div>
+  <button class="sb-add" id="sb-add">add to bag</button>
+</div>
+
+<!-- ═══ TOAST STACK ═════════════════════════════════════════════ -->
+<div id="toast-stack"></div>
 </body>
 </html>
