@@ -202,15 +202,50 @@ function openModal(id){
 window.closeModal=()=>{document.getElementById('m-ov').classList.remove('on');document.body.style.overflow='';};
 document.getElementById('m-close').addEventListener('click',closeModal);
 document.getElementById('m-ov').addEventListener('click',e=>{if(e.target===document.getElementById('m-ov'))closeModal();});
+
+/* ── PRODUCT CARD: single-tap swaps image, double-tap opens modal ── */
+let pcTapTimer=null;
+let pcTapCard=null;
 document.addEventListener('click',e=>{
-  const card=e.target.closest('[data-modal]');
-  if(card){e.stopPropagation();openModal(card.dataset.modal);}
-});
-document.addEventListener('click',e=>{
-  const card=e.target.closest('.pc');
-  if(card&&!e.target.closest('[data-wish]')&&!e.target.closest('.pc-qa')&&!e.target.closest('[data-modal]')){
-    openModal(card.dataset.id);
+  /* "pairs well with" cards inside the modal — open immediately */
+  const mPair=e.target.closest('.m-pair-card[data-modal]');
+  if(mPair){e.stopPropagation();openModal(mPair.dataset.modal);return;}
+  /* skip wish / add-to-bag buttons */
+  if(e.target.closest('[data-wish]')||e.target.closest('.pc-qa'))return;
+  const card=e.target.closest('.pc[data-id]');
+  if(!card)return;
+  e.stopPropagation();
+  const id=card.dataset.id;
+  if(pcTapTimer&&pcTapCard===id){
+    /* double click/tap → open modal */
+    clearTimeout(pcTapTimer);pcTapTimer=null;pcTapCard=null;
+    openModal(id);
+  } else {
+    /* first tap → toggle image after short delay (to detect double) */
+    pcTapCard=id;
+    pcTapTimer=setTimeout(()=>{
+      pcTapTimer=null;pcTapCard=null;
+      const p=CATALOG[id];if(!p)return;
+      const allImgs=p.imgs||[p.img];
+      if(allImgs.length<2)return;
+      const primary=card.querySelector('.pc-primary-img');
+      const hover=card.querySelector('.pc-hover-img');
+      if(!primary||!hover)return;
+      const isFlipped=card.classList.contains('img-flipped');
+      if(isFlipped){
+        primary.style.opacity='';hover.style.opacity='';
+        card.classList.remove('img-flipped');
+      } else {
+        primary.style.opacity='0';hover.style.opacity='1';
+        card.classList.add('img-flipped');
+      }
+    },280);
   }
+});
+/* Search result cards: no data-id, just data-modal → open modal on click */
+document.addEventListener('click',e=>{
+  const card=e.target.closest('.pc[data-modal]:not([data-id])');
+  if(card){e.stopPropagation();openModal(card.dataset.modal);}
 });
 
 /* ── SEARCH ─────────────────────────────────────────────── */
