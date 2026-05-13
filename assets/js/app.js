@@ -99,7 +99,10 @@ function makeProductCard(id,extraClass=''){
   const p=CATALOG[id];
   const low=p.edN<=5?'<span class="badge-pill badge-low">almost gone</span>':'';
   const nw=p.edN>20?'<span class="badge-pill badge-new">new</span>':'';
-  return `<div class="rv"><article class="pc" data-id="${id}" data-modal="${id}"><div class="pc-wrap"><div class="pc-ed"><span>\u2116 ${String(p.edN).padStart(2,'0')} / ${p.edOf}</span></div><div class="pc-badge">${nw}${low}</div><button class="pc-wish ${wishlist.has(id)?'on':''}" data-wish="${id}"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><line x1="6.5" y1="1" x2="6.5" y2="12" stroke="${wishlist.has(id)?'#B6543C':'#2A1F18'}" stroke-width="1.2" stroke-linecap="round"/><line x1="1" y1="6.5" x2="12" y2="6.5" stroke="${wishlist.has(id)?'#B6543C':'#2A1F18'}" stroke-width="1.2" stroke-linecap="round"/></svg></button><img src="${IMGS[p.img]}" alt="${p.name}"><button class="pc-qa" data-id="${id}">add to bag \u2014 $${p.price}</button></div><p class="pc-coll">${p.coll}</p><div class="pc-foot"><div><p class="pc-name">${p.name}</p><p class="pc-verse">\u201c${p.ins}\u201d \u2014 ${p.verse}</p></div><p class="pc-price">$${p.price}</p></div></article></div>`;
+  const allImgs = p.imgs || [p.img];
+  const primarySrc = IMGS[allImgs[0]];
+  const hoverImg = allImgs.length > 1 ? `<img class="pc-hover-img" src="${IMGS[allImgs[1]]}" alt="${p.name} — worn">` : '';
+  return `<div class="rv"><article class="pc ${allImgs.length>1?'has-hover':''}" data-id="${id}" data-modal="${id}"><div class="pc-wrap"><div class="pc-ed"><span>\u2116 ${String(p.edN).padStart(2,'0')} / ${p.edOf}</span></div><div class="pc-badge">${nw}${low}</div><button class="pc-wish ${wishlist.has(id)?'on':''}" data-wish="${id}"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><line x1="6.5" y1="1" x2="6.5" y2="12" stroke="${wishlist.has(id)?'#B6543C':'#2A1F18'}" stroke-width="1.2" stroke-linecap="round"/><line x1="1" y1="6.5" x2="12" y2="6.5" stroke="${wishlist.has(id)?'#B6543C':'#2A1F18'}" stroke-width="1.2" stroke-linecap="round"/></svg></button><img class="pc-primary-img" src="${primarySrc}" alt="${p.name}">${hoverImg}<button class="pc-qa" data-id="${id}">add to bag \u2014 $${p.price}</button></div><p class="pc-coll">${p.coll}</p><div class="pc-foot"><div><p class="pc-name">${p.name}</p><p class="pc-verse">\u201c${p.ins}\u201d \u2014 ${p.verse}</p></div><p class="pc-price">$${p.price}</p></div></article></div>`;
 }
 
 /* ── HOME GRID ─────────────────────────────────────────── */
@@ -147,10 +150,28 @@ document.getElementById('list-view-btn').addEventListener('click',()=>{
 });
 
 /* ── PRODUCT MODAL ─────────────────────────────────────── */
+let mGalleryIdx = 0;
 function openModal(id){
   const p=CATALOG[id]; if(!p)return;
-  document.getElementById('m-img').src=IMGS[p.img];
-  document.getElementById('m-img').alt=p.name;
+  const allImgs = p.imgs || [p.img];
+  mGalleryIdx = 0;
+  // build gallery
+  const track = document.getElementById('m-gallery-track');
+  track.innerHTML = allImgs.map(key=>`<div class="m-gallery-slide"><img src="${IMGS[key]}" alt="${p.name}"></div>`).join('');
+  track.style.transform = 'translateX(0)';
+  const dots = document.getElementById('m-gallery-dots');
+  if(allImgs.length > 1){
+    dots.innerHTML = allImgs.map((_,i)=>`<button class="m-gal-dot${i===0?' on':''}" data-gi="${i}"></button>`).join('');
+    dots.style.display = '';
+  } else { dots.innerHTML = ''; dots.style.display = 'none'; }
+  // swipe
+  const gallery = document.getElementById('m-gallery');
+  let sx=0, dx=0;
+  function galGo(n){ mGalleryIdx=n; track.style.transform=`translateX(-${n*100}%)`; dots.querySelectorAll('.m-gal-dot').forEach((d,i)=>d.classList.toggle('on',i===n)); }
+  gallery.ontouchstart=e=>{sx=e.touches[0].clientX;dx=0;};
+  gallery.ontouchmove=e=>{dx=e.touches[0].clientX-sx;};
+  gallery.ontouchend=()=>{if(Math.abs(dx)>40){if(dx<0&&mGalleryIdx<allImgs.length-1)galGo(mGalleryIdx+1);else if(dx>0&&mGalleryIdx>0)galGo(mGalleryIdx-1);}};
+  dots.onclick=e=>{const d=e.target.closest('.m-gal-dot');if(d)galGo(+d.dataset.gi);};
   const pairs=Object.entries(CATALOG).filter(([k])=>k!==id).slice(0,3);
   document.getElementById('m-cnt').innerHTML=`
     <p class="m-coll">${p.coll}</p>
